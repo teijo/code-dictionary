@@ -8,7 +8,6 @@ const Comparison = React.createClass({
   },
   render() {
     let {languages, keywords} = this.props;
-    console.log(languages, keywords);
     return (
         <table>
           <thead>
@@ -36,7 +35,7 @@ const Main = React.createClass({
     return (
         <div>
           <h1>Code Dictionary</h1>
-          <Comparison keywords={["map", "import"]} languages={[Directory.javascript, Directory.c_sharp]}/>
+          <Comparison keywords={Directory.keywords} languages={Directory.languages}/>
         </div>
     );
   }

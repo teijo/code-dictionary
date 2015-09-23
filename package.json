@@ -25,6 +25,7 @@
     "react": "./bower_components/react/react.js",
     "classNames": "./bower_components/classnames/index.js",
     "immutable": "./bower_components/immutable/dist/immutable.js",
-    "howler": "./bower_components/howler/howler.js"
+    "howler": "./bower_components/howler/howler.js",
+    "lodash": "./bower_components/lodash/lodash.min.js"
   }
 }
