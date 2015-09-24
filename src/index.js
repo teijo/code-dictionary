@@ -1,6 +1,27 @@
 import React from "react";
 import * as Directory from "./directory";
 
+const Filter = React.createClass({
+  propTypes: {
+    items: React.PropTypes.array.isRequired
+  },
+  render() {
+    let {items} = this.props;
+    return (
+        <nav>
+          <ul>
+            {items.map((item) => (
+              <li key={item}>
+                <a href="#">{item}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+    );
+  }
+});
+
+
 const Comparison = React.createClass({
   propTypes: {
     languages: React.PropTypes.array.isRequired,
@@ -35,6 +56,8 @@ const Main = React.createClass({
     return (
         <div>
           <h1>Code Dictionary</h1>
+          <Filter items={Directory.keywords}/>
+          <Filter items={Directory.languages.map(l => l.name)}/>
           <Comparison keywords={Directory.keywords} languages={Directory.languages}/>
         </div>
     );
