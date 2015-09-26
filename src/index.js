@@ -1,18 +1,62 @@
 import React from "react";
+import Bacon from "Bacon";
 import * as Directory from "./directory";
+
+// ?a=b,c&d=e -> {a: ["b", "c"], d: ["e"]}
+function fromQuery(queryString) {
+  return queryString.slice(1).split("&").reduce((acc, kv) => {
+    let [k, v] = kv.split("=");
+    if (v === undefined) {
+      return acc;
+    }
+    acc[k] = v.split(',').map(decodeURIComponent);
+    return acc;
+  }, {});
+}
+
+function toQuery(state) {
+  return "?" + Object.keys(state).map(k => k + "=" + state[k].map(encodeURIComponent).join(",")).join("&");
+}
+
+const filterUpdateE = new Bacon.Bus();
+const filtersP = filterUpdateE.scan(fromQuery(window.location.search), (state, update) => {
+  if (!state.hasOwnProperty(update.type)) {
+    state[update.type] = [];
+  }
+  if (state[update.type].indexOf(update.value) !== -1) {
+    state[update.type] = state[update.type].filter(v => v !== update.value);
+    if (state[update.type].length === 0) {
+      delete state[update.type];
+    }
+  } else {
+    state[update.type].push(update.value);
+  }
+  return state;
+});
+
+filtersP.onValue(state => history.pushState(null, null, toQuery(state)));
+
+function updateFilter(name, item) {
+  return (e) => {
+    e.preventDefault();
+    filterUpdateE.push({type: name, value: item});
+  }
+}
 
 const Filter = React.createClass({
   propTypes: {
+    name: React.PropTypes.string.isRequired,
     items: React.PropTypes.array.isRequired
   },
   render() {
-    let {items} = this.props;
+    let {items, name} = this.props;
     return (
         <nav>
           <ul>
+            <li>{name}</li>
             {items.map((item) => (
               <li key={item}>
-                <a href="#">{item}</a>
+                <a href="#" onClick={updateFilter(name, item)}>{item}</a>
               </li>
             ))}
           </ul>
@@ -52,16 +96,26 @@ const Comparison = React.createClass({
 
 
 const Main = React.createClass({
+  propTypes: {
+    filters: React.PropTypes.object.isRequired
+  },
   render() {
+    let {filters} = this.props;
+    let keywords = filters.keywords
+      ? Directory.keywords.filter(k => filters.keywords.indexOf(k) !== -1)
+      : Directory.keywords;
+    let languages = filters.languages
+      ? Directory.languages.filter(l => filters.languages.indexOf(l.name) !== -1)
+      : Directory.languages;
     return (
         <div>
           <h1>Code Dictionary</h1>
-          <Filter items={Directory.keywords}/>
-          <Filter items={Directory.languages.map(l => l.name)}/>
-          <Comparison keywords={Directory.keywords} languages={Directory.languages}/>
+          <Filter name="keywords" items={Directory.keywords}/>
+          <Filter name="languages" items={Directory.languages.map(l => l.name)}/>
+          <Comparison keywords={keywords} languages={languages}/>
         </div>
     );
   }
 });
 
-React.render(<Main/>, document.getElementById("main"));
+filtersP.onValue((filters) => React.render(<Main filters={filters}/>, document.getElementById("main")));
