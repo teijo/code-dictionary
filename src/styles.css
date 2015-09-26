@@ -1,5 +1,6 @@
 nav ul {
   margin: 0;
+  padding: 0;
 }
 nav li {
   display: inline-block;
@@ -7,4 +8,22 @@ nav li {
 }
 nav li.selected {
   font-weight: bold;
+}
+
+table {
+  width: 100%;
+}
+
+thead th {
+  background-color: lightblue;
+}
+
+tbody th {
+  background-color: lightgoldenrodyellow;
+}
+
+.not-defined {
+  background-color: #EEE;
+  color: #CCC;
+  text-align: center;
 }

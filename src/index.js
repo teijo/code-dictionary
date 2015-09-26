@@ -86,7 +86,14 @@ const Comparison = React.createClass({
             {keywords.map((keyword) => (
               <tr key={"keyword_" + keyword}>
                 <th>{keyword}</th>
-                {languages.map((language, index) => <td key={index}>{language.syntax[keyword] ? language.syntax[keyword].code.map((syntax, sindex) => <pre key={sindex}>{syntax.code}</pre>) : "N/A"}</td>)}
+                {languages.map((language, index) => {
+                    let isDefined = language.syntax[keyword];
+                    return (
+                        <td className={isDefined ? "" : "not-defined"} key={index}>
+                          {isDefined ? language.syntax[keyword].code.map((syntax, sindex) => <pre key={sindex}>{syntax.code}</pre>) : "N/A"}
+                        </td>
+                      );
+                    })}
               </tr>
               ))}
           </tbody>
