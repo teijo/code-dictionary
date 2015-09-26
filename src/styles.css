@@ -5,3 +5,6 @@ nav li {
   display: inline-block;
   margin: 5px;
 }
+nav li.selected {
+  font-weight: bold;
+}

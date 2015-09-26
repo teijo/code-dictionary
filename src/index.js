@@ -46,16 +46,17 @@ function updateFilter(name, item) {
 const Filter = React.createClass({
   propTypes: {
     name: React.PropTypes.string.isRequired,
+    selected: React.PropTypes.array.isRequired,
     items: React.PropTypes.array.isRequired
   },
   render() {
-    let {items, name} = this.props;
+    let {items, name, selected} = this.props;
     return (
         <nav>
           <ul>
             <li>{name}</li>
             {items.map((item) => (
-              <li key={item}>
+              <li className={selected.indexOf(item) !== -1 ? "selected" : ""} key={item}>
                 <a href="#" onClick={updateFilter(name, item)}>{item}</a>
               </li>
             ))}
@@ -101,17 +102,19 @@ const Main = React.createClass({
   },
   render() {
     let {filters} = this.props;
-    let keywords = filters.keywords
-      ? Directory.keywords.filter(k => filters.keywords.indexOf(k) !== -1)
+    let selectedKeywords = filters.keywords || []
+    let keywords = selectedKeywords.length > 0
+      ? Directory.keywords.filter(k => selectedKeywords.indexOf(k) !== -1)
       : Directory.keywords;
-    let languages = filters.languages
-      ? Directory.languages.filter(l => filters.languages.indexOf(l.name) !== -1)
+    let selectedLanguages = filters.languages || []
+    let languages = selectedLanguages.length > 0
+      ? Directory.languages.filter(l => selectedLanguages.indexOf(l.name) !== -1)
       : Directory.languages;
     return (
         <div>
           <h1>Code Dictionary</h1>
-          <Filter name="keywords" items={Directory.keywords}/>
-          <Filter name="languages" items={Directory.languages.map(l => l.name)}/>
+          <Filter name="keywords" selected={selectedKeywords} items={Directory.keywords}/>
+          <Filter name="languages" selected={selectedLanguages} items={Directory.languages.map(l => l.name)}/>
           <Comparison keywords={keywords} languages={languages}/>
         </div>
     );
