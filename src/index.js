@@ -71,16 +71,17 @@ const Grid = React.createClass({
   propTypes: {
     xs: React.PropTypes.array.isRequired,
     ys: React.PropTypes.array.isRequired,
-    data: React.PropTypes.object.isRequired
+    data: React.PropTypes.object.isRequired,
+    render: React.PropTypes.func.isRequired
   },
   render() {
-    let {xs, ys, data} = this.props;
+    let {xs, ys, data, render} = this.props;
     return (
         <table>
           <thead>
             <tr>
               <th></th>
-              {xs.map((value, index) => <th key={index}>{value.name}</th>)}
+              {xs.map((value, index) => <th key={index}>{value}</th>)}
             </tr>
           </thead>
           <tbody>
@@ -90,8 +91,8 @@ const Grid = React.createClass({
                 {xs.map((x, index) =>{
                     let isDefined = data.hasOwnProperty(x) && data[x].hasOwnProperty(y);
                     return (
-                        <td className={isDefined ? "" : "not-defined"} key={index}>
-                          {isDefined ? data[x][y].code.map((syntax, sindex) => <pre key={sindex}>{syntax.code}</pre>) : "N/A"}
+                        <td key={index}>
+                          {isDefined ? render(data[x][y]) : null}
                         </td>
                       );
                     })}
@@ -103,6 +104,9 @@ const Grid = React.createClass({
   }
 });
 
+function render(data) {
+  return data.code.map((syntax, sindex) => <pre key={sindex}>{syntax.code}</pre>);
+}
 
 const Main = React.createClass({
   propTypes: {
@@ -127,7 +131,7 @@ const Main = React.createClass({
           <h1>Code Dictionary</h1>
           <Filter name="keywords" selected={selectedKeywords} items={Directory.keywords}/>
           <Filter name="languages" selected={selectedLanguages} items={Directory.languages.map(l => l.name)}/>
-          <Grid xs={languages.map(l => l.name)} ys={keywords} data={data}/>
+          <Grid xs={languages.map(l => l.name)} ys={keywords} data={data} render={render}/>
         </div>
     );
   }

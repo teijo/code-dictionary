@@ -22,7 +22,7 @@ tbody th {
   background-color: lightgoldenrodyellow;
 }
 
-.not-defined {
+td:empty {
   background-color: #EEE;
   color: #CCC;
   text-align: center;
