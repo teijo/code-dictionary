@@ -67,30 +67,31 @@ const Filter = React.createClass({
 });
 
 
-const Comparison = React.createClass({
+const Grid = React.createClass({
   propTypes: {
-    languages: React.PropTypes.array.isRequired,
-    keywords: React.PropTypes.array.isRequired
+    xs: React.PropTypes.array.isRequired,
+    ys: React.PropTypes.array.isRequired,
+    data: React.PropTypes.object.isRequired
   },
   render() {
-    let {languages, keywords} = this.props;
+    let {xs, ys, data} = this.props;
     return (
         <table>
           <thead>
             <tr>
               <th></th>
-              {languages.map((language, index) => <th key={index}>{language.name}</th>)}
+              {xs.map((value, index) => <th key={index}>{value.name}</th>)}
             </tr>
           </thead>
           <tbody>
-            {keywords.map((keyword) => (
-              <tr key={"keyword_" + keyword}>
-                <th>{keyword}</th>
-                {languages.map((language, index) => {
-                    let isDefined = language.syntax[keyword];
+            {ys.map((y) => (
+              <tr key={"keyword_" + y}>
+                <th>{y}</th>
+                {xs.map((x, index) =>{
+                    let isDefined = data.hasOwnProperty(x) && data[x].hasOwnProperty(y);
                     return (
                         <td className={isDefined ? "" : "not-defined"} key={index}>
-                          {isDefined ? language.syntax[keyword].code.map((syntax, sindex) => <pre key={sindex}>{syntax.code}</pre>) : "N/A"}
+                          {isDefined ? data[x][y].code.map((syntax, sindex) => <pre key={sindex}>{syntax.code}</pre>) : "N/A"}
                         </td>
                       );
                     })}
@@ -117,12 +118,16 @@ const Main = React.createClass({
     let languages = selectedLanguages.length > 0
       ? Directory.languages.filter(l => selectedLanguages.indexOf(l.name) !== -1)
       : Directory.languages;
+    let data = languages.reduce((acc, l) => {
+      acc[l.name] = l.syntax;
+      return acc;
+    }, {});
     return (
         <div>
           <h1>Code Dictionary</h1>
           <Filter name="keywords" selected={selectedKeywords} items={Directory.keywords}/>
           <Filter name="languages" selected={selectedLanguages} items={Directory.languages.map(l => l.name)}/>
-          <Comparison keywords={keywords} languages={languages}/>
+          <Grid xs={languages.map(l => l.name)} ys={keywords} data={data}/>
         </div>
     );
   }
