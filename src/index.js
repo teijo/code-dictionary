@@ -1,5 +1,6 @@
 import React from "react";
 import Bacon from "Bacon";
+import _ from "lodash";
 import * as Directory from "./directory";
 
 // ?a=b,c&d=e -> {a: ["b", "c"], d: ["e"]}
@@ -114,27 +115,28 @@ const Main = React.createClass({
   },
   render() {
     let {filters} = this.props;
-    let selectedKeywords = filters.keywords || []
-    let keywords = selectedKeywords.length > 0
-      ? Directory.keywords.filter(k => selectedKeywords.indexOf(k) !== -1)
-      : Directory.keywords;
-    let selectedLanguages = filters.languages || []
-    let languages = selectedLanguages.length > 0
-      ? Directory.languages.filter(l => selectedLanguages.indexOf(l.name) !== -1)
-      : Directory.languages;
-    let data = languages.reduce((acc, l) => {
-      acc[l.name] = l.syntax;
-      return acc;
-    }, {});
     return (
         <div>
           <h1>Code Dictionary</h1>
-          <Filter name="keywords" selected={selectedKeywords} items={Directory.keywords}/>
-          <Filter name="languages" selected={selectedLanguages} items={Directory.languages.map(l => l.name)}/>
-          <Grid xs={languages.map(l => l.name)} ys={keywords} data={data} render={render}/>
+          <Filter name="keywords" selected={filters.keywords} items={Directory.keywords}/>
+          <Filter name="languages" selected={filters.languages} items={Directory.languages}/>
+          <Grid xs={filters.languages} ys={filters.keywords} data={Directory.data} render={render}/>
         </div>
     );
   }
 });
 
-filtersP.onValue((filters) => React.render(<Main filters={filters}/>, document.getElementById("main")));
+function takeValid(input, valid) {
+    return (input || []).length > 0
+      ? _.intersection(input, valid)
+      : valid;
+}
+
+filtersP
+  .map(filters => {
+    return {
+      keywords: takeValid(filters.keywords, Directory.keywords),
+      languages: takeValid(filters.languages, Directory.languages)
+    };
+  })
+  .onValue((filters) => React.render(<Main filters={filters}/>, document.getElementById("main")));
