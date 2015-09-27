@@ -106,7 +106,7 @@ const Grid = React.createClass({
 });
 
 function render(data) {
-  return data.code.map((syntax, sindex) => <pre key={sindex}>{syntax.code}</pre>);
+  return data.code.map((syntax, sindex) => <div><pre key={sindex}>{syntax.code}</pre><p>{syntax.note}</p></div>);
 }
 
 const Main = React.createClass({
