@@ -1,61 +1,117 @@
 import _ from "lodash";
 
-export const data = {
-  "JavaScript": {
-    map: {
-      code: [
-        {
-          code: "{key: value}",
-        },
-        {
-          code: "object[key] = value;"
-        }
-      ]
-    },
-    "import.all": {
-      code: [
+const syntax = {
+  "comment": {
+    "block": [
+      {
+        code: "/*comment*/",
+        users: ["JavaScript", "Java"]
+      },
+      {
+        code: "'''comment'''",
+        users: ["Python"]
+      }
+    ],
+    "line": [
+      {
+        code: "//comment",
+        users: ["JavaScript", "Java"]
+      },
+      {
+        code: "#comment",
+        users: ["Python"]
+      }
+    ]
+  },
+  "controlflow": {
+    "if": [
+      {
+        code: "if condition:\n"+
+              "  block\n"+
+              "elif condition:\n"+
+              "  block\n"+
+              "else:\n"+
+              "  block",
+        users: ["Python"]
+      },
+      {
+        code: "if (condition) block else if (condition) block else block",
+        users: ["Java", "JavaScript"]
+      }
+    ]
+  },
+  "function": {
+    "declaration": [
+      {
+        code: "function identifier(arg1, arg2) { statements }",
+        users: ["JavaScript"]
+      },
+      {
+        code: "def identifier(arg1, arg2): statements",
+        users: ["Python"]
+      }
+    ],
+    "call": [
+      {
+        code: "identifier(arg1, arg2)",
+        users: ["Python", "Java", "JavaScript"]
+      }
+    ]
+  },
+  "variables": {
+    "localscope": [
+      {
+        code: "let identifier = value;\n"+
+              "var identifier = value;",
+        users: ["JavaScript"]
+      },
+      {
+        code: "identifier = value",
+        users: ["Python"]
+      },
+      {
+        code: "type identifier = value;",
+        users: ["Java"]
+      }
+    ]
+  },
+  "package": {
+    "import": {
+      "all": [
         {
           code: `import Const from "./const"`,
-          note: "Imports default export"
+          users: ["JavaScript"]
         }
-      ]
-    },
-    "import.module": {
-      code: [
+      ],
+      "partial": [
         {
           code: `import {Foo, Bar} from "./const"`,
-          note: "Exports accessible via Const.[export]"
-        }
-      ]
-    }
-  },
-  "C#": {
-    "import.module": {
-      code: [
-        {
-          code: `using Color = System.Drawing.Color;`
-        },
-      ]
-    },
-    "import.all": {
-      code: [
-        {
-          code: `using System.Threading;`
+          users: ["JavaScript"]
         }
       ]
     },
-    lambda: {
-      code: [
-        {
-          code: `(a, b) => { a + b }`,
-        },
-        {
-          code: `call(a => a + 1)`,
-        }
-      ]
-    }
   }
-};
+}
+
+function read(prefix, object) {
+  return Object.keys(object).reduce((agg2, k) => {
+    if (object instanceof Array) {
+      return object.reduce((agg, samples) => {
+          samples.users.forEach(u => {
+            if (!agg.hasOwnProperty(u)) {
+              agg[u] = {};
+            }
+            agg[u][prefix] = {code: [{code: samples.code}]};
+        });
+        return agg;
+      }, {})
+    } else {
+      return _.merge(agg2, read(prefix + "." + k, object[k]));
+    }
+  }, {});
+}
+
+export const data = read("", syntax);
 
 export const languages = Object.keys(data);
 
