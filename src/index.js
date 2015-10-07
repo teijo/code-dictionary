@@ -35,7 +35,7 @@ const filtersP = filterUpdateE.scan(fromQuery(window.location.search), (state, u
   return state;
 });
 
-filtersP.onValue(state => history.pushState(null, null, toQuery(state)));
+filtersP.skip(1).onValue(state => history.pushState(null, null, toQuery(state)));
 
 function updateFilter(name, item) {
   return (e) => {
@@ -88,7 +88,7 @@ const Grid = React.createClass({
           <tbody>
             {ys.map((y) => (
               <tr key={"keyword_" + y}>
-                <th>{y}</th>
+                <th id={y}><a href={"#" + y}>{y}</a></th>
                 {xs.map((x, index) =>{
                     let isDefined = data.hasOwnProperty(x) && data[x].hasOwnProperty(y);
                     return (
