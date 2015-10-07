@@ -77,8 +77,13 @@ const Grid = React.createClass({
   },
   render() {
     let {xs, ys, data, render} = this.props;
+    let colWidth = (90 / xs.length) + "%";
     return (
         <table>
+          <colgroup>
+            <col style={{width: "10%"}}/>
+            {xs.map((value, index) => <col key={index} style={{width: colWidth}}/>)}
+          </colgroup>
           <thead>
             <tr>
               <th></th>
