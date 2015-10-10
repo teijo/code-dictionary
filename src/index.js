@@ -3,6 +3,11 @@ import Bacon from "Bacon";
 import _ from "lodash";
 import * as Directory from "./directory";
 
+const Op = {
+  toggle: Symbol("op-toggle"),
+  clear: Symbol("op-set")
+};
+
 // ?a=b,c&d=e -> {a: ["b", "c"], d: ["e"]}
 function fromQuery(queryString) {
   return queryString.slice(1).split("&").reduce((acc, kv) => {
@@ -26,16 +31,22 @@ const hashP = Bacon
 
 const filterUpdateE = new Bacon.Bus();
 const filtersP = filterUpdateE.scan(fromQuery(window.location.search), (state, update) => {
-  if (!state.hasOwnProperty(update.type)) {
-    state[update.type] = [];
-  }
-  if (state[update.type].indexOf(update.value) !== -1) {
-    state[update.type] = state[update.type].filter(v => v !== update.value);
-    if (state[update.type].length === 0) {
-      delete state[update.type];
+  if (update.op === Op.toggle) {
+    if (!state.hasOwnProperty(update.type)) {
+      state[update.type] = [];
     }
+    if (state[update.type].indexOf(update.value) !== -1) {
+      state[update.type] = state[update.type].filter(v => v !== update.value);
+      if (state[update.type].length === 0) {
+        delete state[update.type];
+      }
+    } else {
+      state[update.type].push(update.value);
+    }
+  } else if (update.op === Op.clear) {
+      delete state[update.type];
   } else {
-    state[update.type].push(update.value);
+    throw new Error(`Unsupported OP: ${state.op}`)
   }
   return state;
 });
@@ -45,7 +56,14 @@ filtersP.skip(1).onValue(state => history.pushState(null, null, toQuery(state)))
 function updateFilter(name, item) {
   return (e) => {
     e.preventDefault();
-    filterUpdateE.push({type: name, value: item});
+    filterUpdateE.push({op: Op.toggle, type: name, value: item});
+  }
+}
+
+function clearFilter(name) {
+  return (e) => {
+    e.preventDefault();
+    filterUpdateE.push({op: Op.clear, type: name});
   }
 }
 
@@ -61,6 +79,7 @@ const Filter = React.createClass({
         <nav>
           <ul>
             <li>{name}</li>
+            <li>[<a href="#" onClick={clearFilter(name)}>clear</a>]</li>
             {items.map((item) => (
               <li className={selected.indexOf(item) !== -1 ? "selected" : ""} key={item}>
                 <a href="#" onClick={updateFilter(name, item)}>{item}</a>
