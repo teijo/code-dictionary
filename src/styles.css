@@ -19,11 +19,15 @@ thead th {
 }
 
 tbody th {
-  background-color: lightgoldenrodyellow;
+  background-color: rgba(240,240,128,0.5);
 }
 
 td:empty {
-  background-color: #EEE;
+  background-color: rgba(200,200,200,0.5);
   color: #CCC;
   text-align: center;
+}
+
+tr.selected {
+  background-color: lightgreen;
 }

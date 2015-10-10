@@ -19,6 +19,11 @@ function toQuery(state) {
   return "?" + Object.keys(state).map(k => k + "=" + state[k].map(encodeURIComponent).join(",")).join("&");
 }
 
+const hashP = Bacon
+    .fromEvent(window, "hashchange")
+    .toProperty({newURL: window.location.hash})
+    .map(e => e.newURL.split("#")[1]);
+
 const filterUpdateE = new Bacon.Bus();
 const filtersP = filterUpdateE.scan(fromQuery(window.location.search), (state, update) => {
   if (!state.hasOwnProperty(update.type)) {
@@ -73,10 +78,11 @@ const Grid = React.createClass({
     xs: React.PropTypes.array.isRequired,
     ys: React.PropTypes.array.isRequired,
     data: React.PropTypes.object.isRequired,
-    render: React.PropTypes.func.isRequired
+    render: React.PropTypes.func.isRequired,
+    selected: React.PropTypes.string
   },
   render() {
-    let {xs, ys, data, render} = this.props;
+    let {xs, ys, data, render, selected} = this.props;
     let colWidth = (90 / xs.length) + "%";
     return (
         <table>
@@ -92,7 +98,7 @@ const Grid = React.createClass({
           </thead>
           <tbody>
             {ys.map((y) => (
-              <tr key={"keyword_" + y}>
+              <tr key={"keyword_" + y} className={y === selected ? "selected" : ""}>
                 <th id={y}><a href={"#" + y}>{y}</a></th>
                 {xs.map((x, index) =>{
                     let isDefined = data.hasOwnProperty(x) && data[x].hasOwnProperty(y);
@@ -116,16 +122,17 @@ function render(data) {
 
 const Main = React.createClass({
   propTypes: {
-    filters: React.PropTypes.object.isRequired
+    filters: React.PropTypes.object.isRequired,
+    selected: React.PropTypes.string.isRequired
   },
   render() {
-    let {filters} = this.props;
+    let {filters, selected} = this.props;
     return (
         <div>
           <h1>Code Dictionary</h1>
           <Filter name="keywords" selected={filters.keywords} items={Directory.keywords}/>
           <Filter name="languages" selected={filters.languages} items={Directory.languages}/>
-          <Grid xs={filters.languages} ys={filters.keywords} data={Directory.data} render={render}/>
+          <Grid xs={filters.languages} ys={filters.keywords} data={Directory.data} selected={selected} render={render}/>
         </div>
     );
   }
@@ -137,11 +144,12 @@ function takeValid(input, valid) {
       : valid;
 }
 
-filtersP
+const activeFiltersP = filtersP
   .map(filters => {
     return {
       keywords: takeValid(filters.keywords, Directory.keywords),
       languages: takeValid(filters.languages, Directory.languages)
     };
-  })
-  .onValue((filters) => React.render(<Main filters={filters}/>, document.getElementById("main")));
+  });
+
+Bacon.onValues(activeFiltersP, hashP, (filters, hash) => React.render(<Main filters={filters} selected={hash}/>, document.getElementById("main")));
