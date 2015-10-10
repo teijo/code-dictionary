@@ -142,7 +142,7 @@ function render(data) {
 const Main = React.createClass({
   propTypes: {
     filters: React.PropTypes.object.isRequired,
-    selected: React.PropTypes.string.isRequired
+    selected: React.PropTypes.string
   },
   render() {
     let {filters, selected} = this.props;
