@@ -15,7 +15,7 @@ function fromQuery(queryString) {
     if (v === undefined) {
       return acc;
     }
-    acc[k] = v.split(',').map(decodeURIComponent);
+    acc[k] = v.split(",").map(decodeURIComponent);
     return acc;
   }, {});
 }
@@ -44,9 +44,9 @@ const filtersP = filterUpdateE.scan(fromQuery(window.location.search), (state, u
       state[update.type].push(update.value);
     }
   } else if (update.op === Op.clear) {
-      delete state[update.type];
+    delete state[update.type];
   } else {
-    throw new Error(`Unsupported OP: ${state.op}`)
+    throw new Error(`Unsupported OP: ${state.op}`);
   }
   return state;
 });
@@ -57,14 +57,14 @@ function updateFilter(name, item) {
   return (e) => {
     e.preventDefault();
     filterUpdateE.push({op: Op.toggle, type: name, value: item});
-  }
+  };
 }
 
 function clearFilter(name) {
   return (e) => {
     e.preventDefault();
     filterUpdateE.push({op: Op.clear, type: name});
-  }
+  };
 }
 
 const Filter = React.createClass({
@@ -120,13 +120,13 @@ const Grid = React.createClass({
               <tr key={"keyword_" + y} className={y === selected ? "selected" : ""}>
                 <th id={y}><a href={"#" + y}>{y}</a></th>
                 {xs.map((x, index) =>{
-                    let isDefined = data.hasOwnProperty(x) && data[x].hasOwnProperty(y);
-                    return (
-                        <td key={index}>
-                          {isDefined ? render(data[x][y]) : null}
-                        </td>
-                      );
-                    })}
+                  let isDefined = data.hasOwnProperty(x) && data[x].hasOwnProperty(y);
+                  return (
+                      <td key={index}>
+                        {isDefined ? render(data[x][y]) : null}
+                      </td>
+                  );
+                })}
               </tr>
               ))}
           </tbody>
@@ -158,17 +158,17 @@ const Main = React.createClass({
 });
 
 function takeValid(input, valid) {
-    return (input || []).length > 0
+  return (input || []).length > 0
       ? _.intersection(input, valid)
       : valid;
 }
 
 const activeFiltersP = filtersP
-  .map(filters => {
-    return {
-      keywords: takeValid(filters.keywords, Directory.keywords),
-      languages: takeValid(filters.languages, Directory.languages)
-    };
-  });
+    .map(filters => {
+      return {
+        keywords: takeValid(filters.keywords, Directory.keywords),
+        languages: takeValid(filters.languages, Directory.languages)
+      };
+    });
 
 Bacon.onValues(activeFiltersP, hashP, (filters, hash) => React.render(<Main filters={filters} selected={hash}/>, document.getElementById("main")));

@@ -89,22 +89,22 @@ const syntax = {
           users: ["JavaScript"]
         }
       ]
-    },
+    }
   }
-}
+};
 
 function read(prefix, object) {
   return Object.keys(object).reduce((agg2, k) => {
     if (object instanceof Array) {
       return object.reduce((agg, samples) => {
-          samples.users.forEach(u => {
-            if (!agg.hasOwnProperty(u)) {
-              agg[u] = {};
-            }
-            agg[u][prefix] = {code: [{code: samples.code}]};
+        samples.users.forEach(u => {
+          if (!agg.hasOwnProperty(u)) {
+            agg[u] = {};
+          }
+          agg[u][prefix] = {code: [{code: samples.code}]};
         });
         return agg;
-      }, {})
+      }, {});
     } else {
       return _.merge(agg2, read(prefix + "." + k, object[k]));
     }
