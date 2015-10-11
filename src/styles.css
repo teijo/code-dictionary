@@ -31,3 +31,11 @@ td:empty {
 tr.selected {
   background-color: lightgreen;
 }
+
+table.fit code {
+  white-space: pre-line;
+}
+
+table code {
+  white-space: pre;
+}

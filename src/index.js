@@ -104,7 +104,7 @@ const Grid = React.createClass({
     let {xs, ys, data, render, selected} = this.props;
     let colWidth = (90 / xs.length) + "%";
     return (
-        <table>
+        <table className="fit">
           <colgroup>
             <col style={{width: "10%"}}/>
             {xs.map((value, index) => <col key={index} style={{width: colWidth}}/>)}
@@ -136,7 +136,7 @@ const Grid = React.createClass({
 });
 
 function render(data) {
-  return data.code.map((syntax, sindex) => <div key={sindex}><pre>{syntax.code}</pre><p>{syntax.note}</p></div>);
+  return data.code.map((syntax, sindex) => <div key={sindex}><code>{syntax.code}</code><p>{syntax.note}</p></div>);
 }
 
 const Main = React.createClass({
