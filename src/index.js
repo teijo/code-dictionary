@@ -79,7 +79,7 @@ const Filter = React.createClass({
         <nav>
           <ul>
             <li>{name}</li>
-            <li>[<a href="#" onClick={clearFilter(name)}>clear</a>]</li>
+            <li>[{(selected.length !== items.length ? <a href="#" onClick={clearFilter(name)}>clear</a> : "clear")}]</li>
             {items.map((item) => (
               <li className={selected.indexOf(item) !== -1 ? "selected" : ""} key={item}>
                 <a href="#" onClick={updateFilter(name, item)}>{item}</a>
